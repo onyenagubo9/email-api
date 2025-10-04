@@ -1,15 +1,21 @@
-require("dotenv").config();
 const express = require("express");
 const nodemailer = require("nodemailer");
+
 const app = express();
 app.use(express.json());
+
+// 🔹 Direct variable definitions (hardcoded)
+const GMAIL_USER = "info.crptex.usa@gmail.com";
+const GMAIL_PASS = "mwmx qhty yegc ifec"; // your Gmail app password
+const FROM_EMAIL = "Crptex <info.crptex.usa@gmail.com>";
+const PORT = 5000;
 
 // Gmail transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
+    user: GMAIL_USER,
+    pass: GMAIL_PASS,
   },
 });
 
@@ -37,15 +43,20 @@ app.post("/send-login-email", async (req, res) => {
   const html = `
     <html>
       <body style="font-family: Arial; margin:0; padding:0; background:#f4f5f7;">
-        <p>Hi ${safeName},</p>
-        <p>We noticed a successful login to your account.</p>
+        <div style="max-width:600px;margin:20px auto;padding:20px;background:white;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);">
+          <h2 style="color:#333;">Hello ${safeName},</h2>
+          <p style="color:#555;">We noticed a successful login to your account.</p>
+          <p style="color:#777;">If this wasn’t you, please secure your account immediately.</p>
+          <br/>
+          <p style="color:#999;font-size:12px;">© 2025 Crptex. All rights reserved.</p>
+        </div>
       </body>
     </html>
   `;
 
   try {
     await transporter.sendMail({
-      from: process.env.FROM_EMAIL,
+      from: FROM_EMAIL,
       to,
       subject: "You signed in — Welcome back!",
       html,
@@ -58,7 +69,6 @@ app.post("/send-login-email", async (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () =>
-  console.log(`Server running at http://0.0.0.0:${PORT}`)
+  console.log(`🚀 Server running on port ${PORT}`)
 );
