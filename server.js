@@ -1,38 +1,35 @@
 const express = require("express");
-const nodemailer = require("nodemailer");
+const Mailjet = require("node-mailjet");
 
 const app = express();
 app.use(express.json());
 
-// 🔹 Direct variable definitions (hardcoded)
-const GMAIL_USER = "info.crptex.usa@gmail.com";
-const GMAIL_PASS = "mwmx qhty yegc ifec"; // your Gmail app password
-const FROM_EMAIL = "Crptex <info.crptex.usa@gmail.com>";
-const PORT = 5000;
+// 🔹 Mailjet credentials
+const MAILJET_API_KEY = "9938ae41ece30248ac7614d92c690e6e";
+const MAILJET_SECRET_KEY = "791802c2617efd3764c9ff94c11e8714";
 
-// Gmail transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: GMAIL_USER,
-    pass: GMAIL_PASS,
-  },
-});
+// 🔹 Initialize Mailjet client
+const mailjet = Mailjet.apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY);
 
-// Main page to check if backend is running
+// 🔹 Constants
+const FROM_EMAIL = "onyenaguboanthony9@gmail.com";
+const FROM_NAME = "Crptex";
+const PORT = process.env.PORT || 5000;
+
+// 🔹 Home route (for status check)
 app.get("/", (req, res) => {
   res.send(`
     <html>
       <head><title>Backend Status</title></head>
       <body style="font-family: Arial; text-align: center; padding: 50px;">
         <h1>✅ Backend is running!</h1>
-        <p>You can now test the /send-login-email API.</p>
+        <p>You can now test the <b>/send-login-email</b> API.</p>
       </body>
     </html>
   `);
 });
 
-// Login email route
+// 🔹 POST route for sending login email
 app.post("/send-login-email", async (req, res) => {
   const { to, name } = req.body;
 
@@ -55,20 +52,36 @@ app.post("/send-login-email", async (req, res) => {
   `;
 
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
-      to,
-      subject: "You signed in — Welcome back!",
-      html,
-    });
+    const request = await mailjet
+      .post("send", { version: "v3.1" })
+      .request({
+        Messages: [
+          {
+            From: {
+              Email: FROM_EMAIL,
+              Name: FROM_NAME,
+            },
+            To: [
+              {
+                Email: to,
+                Name: safeName,
+              },
+            ],
+            Subject: "You signed in — Welcome back!",
+            HTMLPart: html,
+          },
+        ],
+      });
+
+    console.log("✅ Email sent:", request.body);
     res.json({ ok: true, message: `Login email sent to ${to}` });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ ok: false, error: err.message });
+    console.error("❌ Mailjet Error:", err.message || err);
+    res.status(500).json({ ok: false, error: err.message || err });
   }
 });
 
-// Start server
+// 🔹 Start server
 app.listen(PORT, "0.0.0.0", () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );
