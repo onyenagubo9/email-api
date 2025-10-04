@@ -14,7 +14,7 @@ const mailjet = Mailjet.apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY);
 // 🔹 Constants
 const FROM_EMAIL = "onyenaguboanthony9@gmail.com";
 const FROM_NAME = "Crptex";
-const PORT = process.env.PORT || 5000;
+const PORT =  5000;
 
 // 🔹 Home route (for status check)
 app.get("/", (req, res) => {
