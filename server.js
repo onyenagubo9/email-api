@@ -12,7 +12,7 @@ const MAILJET_SECRET_KEY = "791802c2617efd3764c9ff94c11e8714";
 const mailjet = Mailjet.apiConnect(MAILJET_API_KEY, MAILJET_SECRET_KEY);
 
 // 🔹 Constants
-const FROM_EMAIL = "onyenaguboanthony9@gmail.com";
+const FROM_EMAIL = "info.crptex.usa@gmail.com";
 const FROM_NAME = "Crptex";
 const PORT =  5000;
 
